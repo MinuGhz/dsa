@@ -128,6 +128,24 @@ class BigNumber:
             return self.add(bignum)
 
 
+    def rightShift(self , n = 1):
+
+        while n > 0:
+            self.magnitude.pop()
+            n -= 1
+
+        return self.magnitude
+
+
+    def leftShift(self , n = 1):
+
+        while n > 0:
+            self.magnitude.append(0)
+            n -= 1
+
+        return self.magnitude
+
+
 
 
 
@@ -145,3 +163,5 @@ b2 = BigNumber('8754')
 print(b1.magnitude , b1.sign)
 print(b2.magnitude, b2.sign)
 print(b1.sub(b2) , b1.sign)
+print(b2.leftShift(2))
+print(b2.rightShift())
