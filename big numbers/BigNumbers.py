@@ -66,7 +66,7 @@ class BigNumber:
             self.magnitude =  result[::-1].copy()             #if you want your main Bignumber not to change, ignore this line and return result[::-1] instead
             return self.magnitude
 
-        else:     #if their signs are different
+        else:           #if their signs are different
 
             first = []
             second = []
@@ -99,14 +99,21 @@ class BigNumber:
 
 
             for i in range(len(first)):
-                if first[i] < second[i]:
-                    first[i+1] -= 1
-                    result.append(first[i]+10-second[i])
+
+                if i < len(second):
+                    if first[i] < second[i]:
+                        first[i+1] -= 1
+                        result.append(first[i]+10-second[i])
+
+                    else:
+                        result.append(first[i]-second[i])
 
                 else:
-                    result.append(first[i]-second[i])
+                    result.append(first[i])
 
-            self.magnitude = result[::-1].copy()
+            while result[-1] == 0:
+                result.pop()
+            self.magnitude = result[::-1].copy()                        #if you want your main Bignumber not to change, ignore this line and return result[::-1] instead
             return self.magnitude
 
 
@@ -157,7 +164,7 @@ class BigNumber:
 
 
 
-b1 = BigNumber(1274)
+b1 = BigNumber(12740)
 b2 = BigNumber('8754')
 
 print(b1.magnitude , b1.sign)
