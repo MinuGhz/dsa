@@ -42,36 +42,38 @@ class BigNumber:
 
     def add(self, other):
 
-        result = []
+        result = []              #A temporary list to store the results
         carry = 0
-        if self.sign == other.sign:
-            first = self.magnitude[::-1].copy()
+
+        if self.sign == other.sign:                                           ########CASE 1: If two numbers have the same sign ######
+            first = self.magnitude[::-1].copy()                               #uses 2 temporary lists for easier calculation
             second = other.magnitude[::-1].copy()
+
             for i in range(0 , max(len(first) , len(second))):
                 if i<len(first) and i<len(second):
                     res = first[i] + second[i] + carry
-                    carry = res//10
-                    result.append(res%10)
+
                 elif i >= len(first):
                     res = second[i] + carry
-                    carry = res // 10
-                    result.append(res%10)
+
                 elif i >= len(second):
                     res = first[i] + carry
-                    carry = res // 10
-                    result.append(res % 10)
+
+                carry = res // 10
+                result.append(res % 10)
+
             if carry != 0:
                 result.append(carry)
 
             self.magnitude =  result[::-1].copy()             #if you want your main Bignumber not to change, ignore this line and return result[::-1] instead
             return self.magnitude
 
-        else:           #if their signs are different
+        else:                                                                                  #########CASE2: if their signs are different#######
 
             first = []
             second = []
 
-            if len(self.magnitude) > len(other.magnitude):
+            if len(self.magnitude) > len(other.magnitude):                                    #a condition for finding the final sign
                 first = self.magnitude[::-1].copy()
                 second = other.magnitude[::-1].copy()
             elif len(self.magnitude) == len(other.magnitude):
@@ -92,7 +94,7 @@ class BigNumber:
                     first = self.magnitude[::-1].copy()
                     second = other.magnitude[::-1].copy()
 
-            else:
+            else:                                       #len(self.magnitude) < len(other.magnitude)
                 first = other.magnitude[::-1].copy()
                 second = self.magnitude[::-1].copy()
                 self.sign = other.sign
@@ -113,19 +115,21 @@ class BigNumber:
 
             while result[-1] == 0:
                 result.pop()
+
             self.magnitude = result[::-1].copy()                        #if you want your main Bignumber not to change, ignore this line and return result[::-1] instead
             return self.magnitude
 
 
-    def sub(self , other):
 
-        if self.sign != other.sign:
+    def sub(self , other):                                           #subtract method for 2 Big Numbers
+
+        if self.sign != other.sign:                                  #it's exactly like adding 2 Big Numbers with same signs
             bignum = BigNumber(other.magnitude)
             bignum.sign = self.sign
 
             return self.add(bignum)
 
-        else:
+        else:                                                        #it's exactly like adding 2 Big Numbers with different signs
             bignum = BigNumber(other.magnitude)
             if other.sign == True:
                 bignum.sign = False
@@ -135,7 +139,7 @@ class BigNumber:
             return self.add(bignum)
 
 
-    def rightShift(self , n = 1):
+    def rightShift(self , n = 1):                                #right shift works as   self//(10^n)
 
         while n > 0:
             self.magnitude.pop()
@@ -144,7 +148,7 @@ class BigNumber:
         return self.magnitude
 
 
-    def leftShift(self , n = 1):
+    def leftShift(self , n = 1):                                #left shift works as   self*(10^n)
 
         while n > 0:
             self.magnitude.append(0)
@@ -169,6 +173,6 @@ b2 = BigNumber('8754')
 
 print(b1.magnitude , b1.sign)
 print(b2.magnitude, b2.sign)
-print(b1.sub(b2) , b1.sign)
+print(b1.add(b2) , b1.sign)
 print(b2.leftShift(2))
 print(b2.rightShift())
