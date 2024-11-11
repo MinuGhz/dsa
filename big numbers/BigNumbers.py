@@ -31,7 +31,7 @@ class BigNumber:
                 num //= 10                              # for num = 1234, num_arr is [4,3,2,1]
             self.magnitude = num_arr[::-1].copy()
 
-        else:                             #converts a list of digits to a Big Number
+        else:                                   #converts a list of digits to a Big Number
             if num[0]<0:
                 self.sign = False
             else:
@@ -168,8 +168,8 @@ class BigNumber:
 
 
 
-b1 = BigNumber(12740)
-b2 = BigNumber('8754')
+b1 = BigNumber("120")
+b2 = BigNumber('-20')
 
 print(b1.magnitude , b1.sign)
 print(b2.magnitude, b2.sign)
