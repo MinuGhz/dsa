@@ -145,8 +145,8 @@ class BigNumber:
         result = []
         remainder = []
 
-        for digit in dividend:
-            remainder.append(digit)
+        for num in dividend:
+            remainder.append(num)
 
             while len(remainder) > 1 and remainder[0] == 0:
                 remainder.pop(0)
@@ -156,11 +156,11 @@ class BigNumber:
             divisor_value = int(''.join(map(str, divisor)))
 
 
-            quotient_digit = remainder_value // divisor_value
-            result.append(quotient_digit)
+            res = remainder_value // divisor_value
+            result.append(res)
 
 
-            remainder_value -= quotient_digit * divisor_value
+            remainder_value -= res * divisor_value
             remainder = list(map(int, str(remainder_value)))
 
         result.reverse()
