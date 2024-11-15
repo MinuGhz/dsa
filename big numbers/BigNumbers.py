@@ -32,6 +32,7 @@ class BigNumber:
             self.magnitude = num_arr[::-1].copy()
 
         else:                                   #converts a list of digits to a Big Number
+
             if num[0]<0:
                 self.sign = False
             else:
@@ -132,7 +133,43 @@ class BigNumber:
         return self.magnitude
 
 
+    def division(self, other):
+        # Handle sign of the result
+        result_sign = self.sign == other.sign
 
+        dividend = self.magnitude[:]
+        divisor = other.magnitude[:]
+
+        result = []
+        remainder = []
+
+        for digit in dividend:
+            remainder.append(digit)  # Append the current digit to the remainder
+            # Remove leading zeros in the remainder
+            while len(remainder) > 1 and remainder[0] == 0:
+                remainder.pop(0)
+
+            # Converting every value to int
+            remainder_value = int(''.join(map(str, remainder)))
+            divisor_value = int(''.join(map(str, divisor)))
+
+            # Determine how many times the divisor fits into the remainder
+            quotient_digit = remainder_value // divisor_value
+            result.append(quotient_digit)
+
+            # Update the remainder
+            remainder_value -= quotient_digit * divisor_value
+            remainder = list(map(int, str(remainder_value)))
+
+        result.reverse()
+        while len(result) > 1 and result[-1] == 0:
+            result.pop()
+        result.reverse()
+        # Convert result to BigInteger
+        result_obj = BigNumber(result)
+        result_obj.sign = result_sign
+
+        return result_obj.magnitude , result_obj.sign
 
     def multiply(self , other):
         first = self.magnitude[::-1]
@@ -161,52 +198,59 @@ class BigNumber:
 
         return res
 
-    #
-    # def karatsuba_multiply(self , other):
-    #
-    #     first1 = BigNumber(self.magnitude[0:len(self.magnitude)//2])
-    #     first2 = BigNumber(self.magnitude[len(self.magnitude)//2:])
-    #
-    #     f1 = BigNumber(self.magnitude[0:len(self.magnitude) // 2])
-    #     f2 = BigNumber(self.magnitude[len(self.magnitude) // 2:])
-    #     f0 = BigNumber(f1.add(f2))
-    #
-    #     second1 = BigNumber(other.magnitude[0:len(other.magnitude) // 2])
-    #     second2 = BigNumber(other.magnitude[len(other.magnitude) // 2:])
-    #
-    #     s1 = BigNumber(other.magnitude[0:len(other.magnitude) // 2])
-    #     s2 = BigNumber(other.magnitude[len(other.magnitude) // 2:])
-    #     s0 = BigNumber(s1.add(s2))
-    #
-    #     z0 = first1.multiply(second1)
-    #     z1 = f0.multiply(s0)
-    #     z2 = first2.multiply(second2)
-    #
-    #
-    #     z1.sub(z2)
-    #     z1.sub(z0)
-    #     z1.leftShift(len(self.magnitude)//2)
-    #     z2.leftShift(len(self.magnitude))
-    #     z0.add(z1)
-    #     z0.add(z2)
+
+    def karatsuba_multiply(self , other):
+
+        # Convert arrays to numbers for easier calculation
+        def list_to_number(lst):
+            return int(''.join(map(str, lst)))
+
+        def number_to_list(num):
+            return [int(digit) for digit in str(num)]
+
+        # Base case for recursion
+        if len(self.magnitude) == 1 or len(other.magnitude) == 1:
+            print(self.multiply(other).magnitude)
+            return self.multiply(other).magnitude
+
+        n = max(len(self.magnitude), len(other.magnitude))
+        m = n // 2
+
+        # Split the numbers
+        high1 = list_to_number(self.magnitude[:-m]) if len(self.magnitude) > m else 0
+        low1 = list_to_number(self.magnitude[-m:])
+        high2 = list_to_number(other.magnitude[:-m]) if len(other.magnitude) > m else 0
+        low2 = list_to_number(other.magnitude[-m:])
 
 
-        # if self.sign != other.sign:
-        #     z0.sign = False
-        # else:
-        #     z0.sign = True
-        #
-        # return z0.magnitude
+        # Create BigInteger objects for high and low parts
+        high1_big = BigNumber(high1)
+        low1_big = BigNumber(low1)
+        high2_big = BigNumber(high2)
+        low2_big = BigNumber(low2)
+
+        # Recursive Karatsuba calls
+        z0 = low1_big.karatsuba_multiply(low2_big)  # low1 * low2
+        z2 = high1_big.karatsuba_multiply(high2_big)  # high1 * high2
+        z1 = (low1_big.add(high1_big)).karatsuba_multiply(low2_big.add(high2_big))  # (low1 + high1) * (low2 + high2)
+        z1 = z1.sub(z0).sub(z2)  # Subtract z0 and z2 from z1
+
+        # Combine results: z2 * 10^(2*m) + z1 * 10^m + z0
+        result = z2.leftshift(2 * m).add(z1.leftshift(m)).add(z0)
+
+        # Adjust the sign of the result
+        result.sign = (self.sign == other.sign)
+        print(result.magnitude)
+        return result.magnitude
 
 
     def pow(self , number):
         result = BigNumber(1)
-        result.sign = self.sign
 
         for i in range(number):
             result = result.multiply(self)
 
-        return result.magnitude
+        return result.magnitude , result.sign
 
 
 
@@ -275,19 +319,21 @@ def fact_calculator(number):                                           #calculat
 
 
 
-b1 = BigNumber("-12")
-b2 = BigNumber('2')
-print(b1.magnitude , b1.sign)
-print(b2.magnitude, b2.sign)
+b1 = BigNumber("16658974150")
+b2 = BigNumber('2001548796')
+# print(b1.magnitude , b1.sign)
+# print(b2.magnitude, b2.sign)
 # print(b1.add(b2) , b1.sign)
 # print(b2.leftShift(2))
 # print(b2.rightShift())
 
 # print(fact_calculator(10) , 'kkkk')
-
+# #
 # b3 = b1.multiply(b2)
 #
-# print(b3.magnitude)
+# print(b3.magnitude , b3.sign)
+#
+# print(b1.pow(3))
 
-print(b1.pow(2))
+print(b1.karatsuba_multiply(b2))
 
