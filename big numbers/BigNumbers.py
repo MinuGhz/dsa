@@ -40,6 +40,8 @@ class BigNumber:
             for i in range(len(num)):
                 self.magnitude.append(abs(num[i]))
 
+        self.isSingleDigit = True
+
 
     def add(self , other):
         return self.sign_checker(other.sign , other)
@@ -81,7 +83,7 @@ class BigNumber:
 
 
 
-    def subber(self , other):                                           #subtract method for 2 Big Numbers
+    def subber(self , other):                                           #subtract method for  Big Numbers
 
         first = []
         second = []
@@ -134,7 +136,7 @@ class BigNumber:
 
 
     def division(self, other):
-        # Handle sign of the result
+
         result_sign = self.sign == other.sign
 
         dividend = self.magnitude[:]
@@ -144,20 +146,20 @@ class BigNumber:
         remainder = []
 
         for digit in dividend:
-            remainder.append(digit)  # Append the current digit to the remainder
-            # Remove leading zeros in the remainder
+            remainder.append(digit)
+
             while len(remainder) > 1 and remainder[0] == 0:
                 remainder.pop(0)
 
-            # Converting every value to int
+
             remainder_value = int(''.join(map(str, remainder)))
             divisor_value = int(''.join(map(str, divisor)))
 
-            # Determine how many times the divisor fits into the remainder
+
             quotient_digit = remainder_value // divisor_value
             result.append(quotient_digit)
 
-            # Update the remainder
+
             remainder_value -= quotient_digit * divisor_value
             remainder = list(map(int, str(remainder_value)))
 
@@ -165,7 +167,7 @@ class BigNumber:
         while len(result) > 1 and result[-1] == 0:
             result.pop()
         result.reverse()
-        # Convert result to BigInteger
+
         result_obj = BigNumber(result)
         result_obj.sign = result_sign
 
@@ -201,44 +203,44 @@ class BigNumber:
 
     def karatsuba_multiply(self , other):
 
-        # Convert arrays to numbers for easier calculation
+
         def list_to_number(lst):
             return int(''.join(map(str, lst)))
 
         def number_to_list(num):
             return [int(digit) for digit in str(num)]
 
-        # Base case for recursion
-        if len(self.magnitude) == 1 or len(other.magnitude) == 1:
-            print(self.multiply(other).magnitude)
+
+        if len(self.magnitude) == 1 or len(other.magnitude) == 1 or self.isSingleDigit:
+
             return self.multiply(other).magnitude
 
         n = max(len(self.magnitude), len(other.magnitude))
         m = n // 2
 
-        # Split the numbers
+
         high1 = list_to_number(self.magnitude[:-m]) if len(self.magnitude) > m else 0
         low1 = list_to_number(self.magnitude[-m:])
         high2 = list_to_number(other.magnitude[:-m]) if len(other.magnitude) > m else 0
         low2 = list_to_number(other.magnitude[-m:])
 
 
-        # Create BigInteger objects for high and low parts
+
         high1_big = BigNumber(high1)
         low1_big = BigNumber(low1)
         high2_big = BigNumber(high2)
         low2_big = BigNumber(low2)
 
-        # Recursive Karatsuba calls
-        z0 = low1_big.karatsuba_multiply(low2_big)  # low1 * low2
-        z2 = high1_big.karatsuba_multiply(high2_big)  # high1 * high2
-        z1 = (low1_big.add(high1_big)).karatsuba_multiply(low2_big.add(high2_big))  # (low1 + high1) * (low2 + high2)
-        z1 = z1.sub(z0).sub(z2)  # Subtract z0 and z2 from z1
 
-        # Combine results: z2 * 10^(2*m) + z1 * 10^m + z0
+        z0 = low1_big.karatsuba_multiply(low2_big)
+        z2 = high1_big.karatsuba_multiply(high2_big)
+        z1 = (low1_big.add(high1_big)).karatsuba_multiply(low2_big.add(high2_big))
+        z1 = z1.sub(z0).sub(z2)
+
+
         result = z2.leftshift(2 * m).add(z1.leftshift(m)).add(z0)
 
-        # Adjust the sign of the result
+
         result.sign = (self.sign == other.sign)
         print(result.magnitude)
         return result.magnitude
@@ -319,8 +321,8 @@ def fact_calculator(number):                                           #calculat
 
 
 
-b1 = BigNumber("16658974150")
-b2 = BigNumber('2001548796')
+b1 = BigNumber("166")
+b2 = BigNumber('2')
 # print(b1.magnitude , b1.sign)
 # print(b2.magnitude, b2.sign)
 # print(b1.add(b2) , b1.sign)
