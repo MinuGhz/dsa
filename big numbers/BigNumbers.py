@@ -52,7 +52,7 @@ class BigNumber:
         result = []              #A temporary list to store the results
         carry = 0
 
-                                            
+
         first = self.magnitude[::-1].copy()                               #uses 2 temporary lists for easier calculation
         second = other.magnitude[::-1].copy()
 
@@ -161,6 +161,53 @@ class BigNumber:
 
         return res
 
+    #
+    # def karatsuba_multiply(self , other):
+    #
+    #     first1 = BigNumber(self.magnitude[0:len(self.magnitude)//2])
+    #     first2 = BigNumber(self.magnitude[len(self.magnitude)//2:])
+    #
+    #     f1 = BigNumber(self.magnitude[0:len(self.magnitude) // 2])
+    #     f2 = BigNumber(self.magnitude[len(self.magnitude) // 2:])
+    #     f0 = BigNumber(f1.add(f2))
+    #
+    #     second1 = BigNumber(other.magnitude[0:len(other.magnitude) // 2])
+    #     second2 = BigNumber(other.magnitude[len(other.magnitude) // 2:])
+    #
+    #     s1 = BigNumber(other.magnitude[0:len(other.magnitude) // 2])
+    #     s2 = BigNumber(other.magnitude[len(other.magnitude) // 2:])
+    #     s0 = BigNumber(s1.add(s2))
+    #
+    #     z0 = first1.multiply(second1)
+    #     z1 = f0.multiply(s0)
+    #     z2 = first2.multiply(second2)
+    #
+    #
+    #     z1.sub(z2)
+    #     z1.sub(z0)
+    #     z1.leftShift(len(self.magnitude)//2)
+    #     z2.leftShift(len(self.magnitude))
+    #     z0.add(z1)
+    #     z0.add(z2)
+
+
+        # if self.sign != other.sign:
+        #     z0.sign = False
+        # else:
+        #     z0.sign = True
+        #
+        # return z0.magnitude
+
+
+    def pow(self , number):
+        result = BigNumber(1)
+        result.sign = self.sign
+
+        for i in range(number):
+            result = result.multiply(self)
+
+        return result.magnitude
+
 
 
 
@@ -228,11 +275,11 @@ def fact_calculator(number):                                           #calculat
 
 
 
-b1 = BigNumber("-120")
-b2 = BigNumber('-6')
+b1 = BigNumber("-12")
+b2 = BigNumber('2')
 print(b1.magnitude , b1.sign)
 print(b2.magnitude, b2.sign)
-print(b1.add(b2) , b1.sign)
+# print(b1.add(b2) , b1.sign)
 # print(b2.leftShift(2))
 # print(b2.rightShift())
 
@@ -241,3 +288,6 @@ print(b1.add(b2) , b1.sign)
 # b3 = b1.multiply(b2)
 #
 # print(b3.magnitude)
+
+print(b1.pow(2))
+
