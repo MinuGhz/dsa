@@ -176,7 +176,7 @@ class BigNumber:
             result.sign = True
 
 
-        return result.magnitude , result.sign
+        return result
 
 
 
@@ -210,7 +210,19 @@ class BigNumber:
 
 
 
+def fact_calculator(number):
+    fact = BigNumber(1)
 
+    for i in range(2,number+1):
+        print(fact.magnitude)
+        temp = BigNumber(i)
+        fact = fact.multiply(temp)
+        if i==2:
+            fact.magnitude.pop()
+
+
+
+    return fact.magnitude
 
 
 
@@ -219,11 +231,14 @@ class BigNumber:
 
 b1 = BigNumber("120")
 b2 = BigNumber('-20')
-
 print(b1.magnitude , b1.sign)
 print(b2.magnitude, b2.sign)
 # print(b1.add(b2) , b1.sign)
 # print(b2.leftShift(2))
 # print(b2.rightShift())
 
-print(b1.multiply(b2))
+print(fact_calculator(4))
+
+b3 = b1.multiply(b2)
+
+# print(b3.magnitude)
