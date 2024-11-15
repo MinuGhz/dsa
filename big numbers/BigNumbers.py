@@ -40,143 +40,126 @@ class BigNumber:
                 self.magnitude.append(abs(num[i]))
 
 
-    def add(self, other):
+    def add(self , other):
+        return self.sign_checker(other.sign , other)
+
+    def sub(self , other):
+        return self.sign_checker(not other.sign , other)
+
+
+    def adder(self, other):
 
         result = []              #A temporary list to store the results
         carry = 0
 
-        if self.sign == other.sign:                                           ########CASE 1: If two numbers have the same sign ######
-            first = self.magnitude[::-1].copy()                               #uses 2 temporary lists for easier calculation
+                                            
+        first = self.magnitude[::-1].copy()                               #uses 2 temporary lists for easier calculation
+        second = other.magnitude[::-1].copy()
+
+        for i in range(0 , max(len(first) , len(second))):
+            if i<len(first) and i<len(second):
+                res = first[i] + second[i] + carry
+
+            elif i >= len(first):
+                res = second[i] + carry
+
+            elif i >= len(second):
+                res = first[i] + carry
+
+            carry = res // 10
+            result.append(res % 10)
+
+        if carry != 0:
+            result.append(carry)
+
+        self.magnitude =  result[::-1].copy()             #if you want your main Bignumber not to change, ignore this line and return result[::-1] instead
+        return self.magnitude
+
+
+
+
+
+
+    def subber(self , other):                                           #subtract method for 2 Big Numbers
+
+        first = []
+        second = []
+        result = []
+
+        if len(self.magnitude) > len(other.magnitude):  # a condition for finding the final sign
+            first = self.magnitude[::-1].copy()
             second = other.magnitude[::-1].copy()
+        elif len(self.magnitude) == len(other.magnitude):
+            flag = False
+            for i in range(len(self.magnitude)):
+                if self.magnitude[i] == other.magnitude[i]:
+                    continue
+                elif self.magnitude[i] < other.magnitude[i]:
+                    first = other.magnitude[::-1].copy()
+                    second = self.magnitude[::-1].copy()
+                    self.sign = other.sign
+                    flag = True
+                    break
+                else:
+                    break
 
-            for i in range(0 , max(len(first) , len(second))):
-                if i<len(first) and i<len(second):
-                    res = first[i] + second[i] + carry
-
-                elif i >= len(first):
-                    res = second[i] + carry
-
-                elif i >= len(second):
-                    res = first[i] + carry
-
-                carry = res // 10
-                result.append(res % 10)
-
-            if carry != 0:
-                result.append(carry)
-
-            self.magnitude =  result[::-1].copy()             #if you want your main Bignumber not to change, ignore this line and return result[::-1] instead
-            return self.magnitude
-
-        else:                                                                                  #########CASE2: if their signs are different#######
-
-            first = []
-            second = []
-
-            if len(self.magnitude) > len(other.magnitude):                                    #a condition for finding the final sign
+            if flag == False:
                 first = self.magnitude[::-1].copy()
                 second = other.magnitude[::-1].copy()
-            elif len(self.magnitude) == len(other.magnitude):
-                flag = False
-                for i in range(len(self.magnitude)):
-                    if self.magnitude[i] == other.magnitude[i]:
-                        continue
-                    elif self.magnitude[i] < other.magnitude[i]:
-                        first = other.magnitude[::-1].copy()
-                        second = self.magnitude[::-1].copy()
-                        self.sign = other.sign
-                        flag = True
-                        break
-                    else:
-                        break
 
-                if flag == False:
-                    first = self.magnitude[::-1].copy()
-                    second = other.magnitude[::-1].copy()
+        else:  # len(self.magnitude) < len(other.magnitude)
+            first = other.magnitude[::-1].copy()
+            second = self.magnitude[::-1].copy()
+            self.sign = other.sign
 
-            else:                                       #len(self.magnitude) < len(other.magnitude)
-                first = other.magnitude[::-1].copy()
-                second = self.magnitude[::-1].copy()
-                self.sign = other.sign
+        for i in range(len(first)):
 
-
-            for i in range(len(first)):
-
-                if i < len(second):
-                    if first[i] < second[i]:
-                        first[i+1] -= 1
-                        result.append(first[i]+10-second[i])
-
-                    else:
-                        result.append(first[i]-second[i])
+            if i < len(second):
+                if first[i] < second[i]:
+                    first[i + 1] -= 1
+                    result.append(first[i] + 10 - second[i])
 
                 else:
-                    result.append(first[i])
+                    result.append(first[i] - second[i])
 
-            while result[-1] == 0:
-                result.pop()
-
-            self.magnitude = result[::-1].copy()                        #if you want your main Bignumber not to change, ignore this line and return result[::-1] instead
-            return self.magnitude
-
-
-
-    def sub(self , other):                                           #subtract method for 2 Big Numbers
-
-        if self.sign != other.sign:                                  #it's exactly like adding 2 Big Numbers with same signs
-            bignum = BigNumber(other.magnitude)
-            bignum.sign = self.sign
-
-            return self.add(bignum)
-
-        else:                                                        #it's exactly like adding 2 Big Numbers with different signs
-            bignum = BigNumber(other.magnitude)
-            if other.sign == True:
-                bignum.sign = False
             else:
-                bignum.sign = True
+                result.append(first[i])
 
-            return self.add(bignum)
+        while result[-1] == 0:
+            result.pop()
+
+        self.magnitude = result[::-1].copy()  # if you want your main Bignumber not to change, ignore this line and return result[::-1] instead
+        return self.magnitude
+
+
 
 
     def multiply(self , other):
+        first = self.magnitude[::-1]
+        second = other.magnitude[::-1]
 
-        result = BigNumber([0])
+        result = [0]*(len(first) + len(second))
 
-        carry = 0
-        if len(self.magnitude) >= len(other.magnitude):
-            first = self.magnitude[::-1].copy()
-            second = other.magnitude[::-1].copy()
+        for i in range(len(first)):
+            for j in range(len(second)):
+                result[i+j] += first[i]*second[j]
+                result[i+j+1] += result[i+j]//10
+                result[i+j] %= 10
+
+        while len(result)>1 and result[-1]==0:
+            result.pop()
+
+        result.reverse()
+
+        res = BigNumber(result)
+
+        if self.sign != other.sign:
+            res.sign = False
         else:
-            first = other.magnitude[::-1].copy()
-            second = self.magnitude[::-1].copy()
-
-        for i in range(0 , len(first)):
-            temp = BigNumber()
-            carry = 0
-            for j in range(0 , len(second)):
-                res = first[i]*second[j]+carry
-                temp.magnitude.append(res%10)
-                carry = res//10
-
-            if carry != 0:
-                result.magnitude.append(carry)
-
-            temp.leftShift(i)
-            result.add(temp)
-
-        while result.magnitude[-1] == 0:
-            result.magnitude.pop()
-
-        result.magnitude = result.magnitude[::-1]
-
-        if self.sign != other.sign:                                    #
-            result.sign = False
-        else:
-            result.sign = True
+            res.sign = True
 
 
-        return result
+        return res
 
 
 
@@ -199,26 +182,42 @@ class BigNumber:
 
         return self.magnitude
 
-    def sign_checker(self , other):
-        if self.sign == other.sign:
-            return True
-        else:
-            return False
+    def sign_checker(self ,sign_other, other):
+        sign1 = self.sign
+        sign2 = sign_other
+
+        if sign1 and sign2:  # + +
+            return self.adder(other)
+
+        elif sign1 and not sign2:    # +   -
+            return self.subber(other)
+
+        elif (not sign1) and (not sign2):    # -   -
+            temp = BigNumber(self.adder(other))
+
+            temp.sign = False
+            return temp.magnitude
+
+        if (not sign1) and (sign2):         # -    +
+            return other.subber(self)
 
 
 
 
 
 
-def fact_calculator(number):
+
+
+
+
+def fact_calculator(number):                                           #calculate fact in range[1,100]
     fact = BigNumber(1)
 
     for i in range(2,number+1):
-        print(fact.magnitude)
+        # print(fact.magnitude)
         temp = BigNumber(i)
         fact = fact.multiply(temp)
-        if i==2:
-            fact.magnitude.pop()
+
 
 
 
@@ -229,16 +228,16 @@ def fact_calculator(number):
 
 
 
-b1 = BigNumber("120")
-b2 = BigNumber('-20')
+b1 = BigNumber("-120")
+b2 = BigNumber('-6')
 print(b1.magnitude , b1.sign)
 print(b2.magnitude, b2.sign)
-# print(b1.add(b2) , b1.sign)
+print(b1.add(b2) , b1.sign)
 # print(b2.leftShift(2))
 # print(b2.rightShift())
 
-print(fact_calculator(4))
+# print(fact_calculator(10) , 'kkkk')
 
-b3 = b1.multiply(b2)
-
+# b3 = b1.multiply(b2)
+#
 # print(b3.magnitude)
