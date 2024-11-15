@@ -139,6 +139,49 @@ class BigNumber:
             return self.add(bignum)
 
 
+    def multiply(self , other):
+
+        result = BigNumber([0])
+
+        carry = 0
+        if len(self.magnitude) >= len(other.magnitude):
+            first = self.magnitude[::-1].copy()
+            second = other.magnitude[::-1].copy()
+        else:
+            first = other.magnitude[::-1].copy()
+            second = self.magnitude[::-1].copy()
+
+        for i in range(0 , len(first)):
+            temp = BigNumber()
+            carry = 0
+            for j in range(0 , len(second)):
+                res = first[i]*second[j]+carry
+                temp.magnitude.append(res%10)
+                carry = res//10
+
+            if carry != 0:
+                result.magnitude.append(carry)
+
+            temp.leftShift(i)
+            result.add(temp)
+
+        while result.magnitude[-1] == 0:
+            result.magnitude.pop()
+
+        result.magnitude = result.magnitude[::-1]
+
+        if self.sign != other.sign:                                    #
+            result.sign = False
+        else:
+            result.sign = True
+
+
+        return result.magnitude , result.sign
+
+
+
+
+
     def rightShift(self , n = 1):                                #right shift works as   self//(10^n)
 
         while n > 0:
@@ -155,6 +198,12 @@ class BigNumber:
             n -= 1
 
         return self.magnitude
+
+    def sign_checker(self , other):
+        if self.sign == other.sign:
+            return True
+        else:
+            return False
 
 
 
@@ -173,6 +222,8 @@ b2 = BigNumber('-20')
 
 print(b1.magnitude , b1.sign)
 print(b2.magnitude, b2.sign)
-print(b1.add(b2) , b1.sign)
-print(b2.leftShift(2))
-print(b2.rightShift())
+# print(b1.add(b2) , b1.sign)
+# print(b2.leftShift(2))
+# print(b2.rightShift())
+
+print(b1.multiply(b2))
