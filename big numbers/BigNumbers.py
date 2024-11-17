@@ -248,11 +248,15 @@ class BigNumber:
 
     def pow(self , number):
         result = BigNumber(1)
+        base = self
 
-        for i in range(number):
-            result = result.multiply(self)
+        while number > 0:
+            if number % 2 == 1:
+                result = result.multiply(base)
+            base = base.multiply(base)
+            number //= 2
 
-        return result.magnitude , result.sign
+        return result.magnitude, result.sign
 
 
 
@@ -322,7 +326,7 @@ def fact_calculator(number):                                           #calculat
 
 
 b1 = BigNumber("166")
-b2 = BigNumber('2')
+b2 = BigNumber('12')
 # print(b1.magnitude , b1.sign)
 # print(b2.magnitude, b2.sign)
 # print(b1.add(b2) , b1.sign)
@@ -337,5 +341,5 @@ b2 = BigNumber('2')
 #
 # print(b1.pow(3))
 
-print(b1.karatsuba_multiply(b2))
+print(b2.pow(3))
 
