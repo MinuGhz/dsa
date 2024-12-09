@@ -14,5 +14,15 @@ def fib(n):
 
 
 
+def fib_a(n):
 
-print(fib(10))
+    fib_array = [1,1]
+
+    while len(fib_array) <n+1:
+        fib_array.append(fib_array[-1] + fib_array[-2])
+
+
+    return fib_array
+
+
+print(fib_a(10))
