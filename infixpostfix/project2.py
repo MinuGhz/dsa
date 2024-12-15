@@ -43,57 +43,48 @@ def calculator(op1, op2, operator):
 def Infix_to_Postfix(exp):
     postfix = ""
     exp_operator = Stack()
-    operators = {'+', '-', '*', '/', '^', '(', ')'}
-    i = 0
-    while i < len(exp):
-        ch = exp[i]
+    ch = ""
+    operators = set(['+', '-', '*', "/", '^', '(', ')'])
 
-        # Skip whitespace
-        if ch == ' ':
-            i += 1
-            continue
+    for i in range(len(exp)):
+        if exp[i] is not " ":
+            ch += exp[i]
 
-        # Handle negative numbers
-        if ch == '-' and (i == 0 or exp[i - 1] in operators or exp[i - 1] == '('):
-            # Collect the full negative number
-            number = ch
-            i += 1
-            while i < len(exp) and exp[i].isdigit():
-                number += exp[i]
-                i += 1
-            postfix += number + " "
-            continue
 
-        # If character is an operand
-        if ch.isdigit():
-            number = ""
-            while i < len(exp) and (exp[i].isdigit() or exp[i] == '.'):
-                number += exp[i]
-                i += 1
-            postfix += number + " "
-            continue
+        else:
+            if ch in operators:
 
-        # If character is an operator
-        if ch in operators:
-            if ch == '(':
-                exp_operator.push(ch)
-            elif ch == ')':
-                while exp_operator.top() != '(':
-                    postfix += exp_operator.pop() + " "
-                exp_operator.pop()  # Remove '('
+                if ch == "(" or isHigher(ch, exp_operator.top()) or exp_operator.isEmpty():
+                    exp_operator.push(ch)
+
+                elif ch == ')':
+                    while exp_operator.top() != '(':
+                        op = exp_operator.pop()
+                        postfix += op
+                        postfix += " "
+
+                    exp_operator.pop()
+
+
+                else:
+                    while not isHigher(ch, exp_operator.top()):
+                        op = exp_operator.pop()
+                        postfix += op
+                        postfix += " "
+
+
             else:
-                while (not exp_operator.isEmpty() and
-                       exp_operator.top() != '(' and
-                       isHigher(ch, exp_operator.top())):
-                    postfix += exp_operator.pop() + " "
-                exp_operator.push(ch)
-        i += 1
+                postfix += ch
+                postfix += " "
 
-    # Pop remaining operators
+            ch = ""
+
     while not exp_operator.isEmpty():
-        postfix += exp_operator.pop() + " "
+        op = exp_operator.pop()
+        postfix += op
+        postfix += " "
 
-    return postfix.strip()
+    return postfix
 
 
 def postfix_calculator(exp):
@@ -175,7 +166,7 @@ def Infix_to_Prefix(exp):
 
 
 # Test the functions
-exp = "-2 * ( 3 - 1 + 5 ^ 2 )"
+exp = "-12 * ( 3 - 1 + 5 ^ 2 )"
 post = Infix_to_Postfix(exp)
 print("Postfix:", post)
 
