@@ -1,3 +1,8 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sympy import symbols, sympify, lambdify
+
+
 class Stack:
     def __init__(self):
         self.stack = []
@@ -174,7 +179,35 @@ def prefix_calculator(exp):
 
 
 #######################################################################################################################
+def create_function(exp):
+    # create a function from a string expression
+    # def f(x):
+    #     return eval(input_str)
+    # return f
+    return lambda x: eval(exp)
 
+
+def process_expression(exp):
+    # plot the expression given as a string
+    x = np.linspace(-10, 10, 500)
+
+    # Define the function
+    func = create_function(exp)
+    y = func(x)
+
+    # Create the plot
+    plt.figure(figsize=(10, 5))
+    plt.plot(x, y, label="y = 2x²")
+    plt.title("Plot of y = 2x²")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.axhline(0, color='black', linewidth=0.8)
+    plt.axvline(0, color='black', linewidth=0.8)
+    plt.grid(color='gray', linestyle='--', linewidth=0.5)
+    plt.legend()
+    plt.show()
+
+####################################################################################################################
 
 
 # Test the functions
@@ -191,3 +224,5 @@ print("Prefix: " , prefix)
 #
 res = prefix_calculator(prefix)
 print("Result:", res)
+
+process_expression("x ** x * x - x")
