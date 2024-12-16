@@ -21,8 +21,8 @@ class Stack:
 def isHigher(op, top_op):
     if top_op is None:
         return False
-    precedence = {'+': 1, '-': 1, '*': 2, '/': 2, '^': 3}
-    return precedence[top_op] >= precedence[op]
+    precedence = { '+': 1, '-': 1, '*': 2, '/': 2, '^': 3, '(':4 , ')':4}
+    return precedence[top_op] > precedence[op]
 
 
 def calculator(op1, op2, operator):
@@ -41,48 +41,50 @@ def calculator(op1, op2, operator):
 ########################################################################################################################
 
 def Infix_to_Postfix(exp):
-    postfix = ""
+    postfix = []
     exp_operator = Stack()
-    ch = ""
-    operators = set(['+', '-', '*', "/", '^', '(', ')'])
+    operators = {'+', '-', '*', "/", '^', '(', ')'}
 
-    for i in range(len(exp)):
-        if exp[i] is not " ":
-            ch += exp[i]
+    exp = exp.split(" ")
+    print(exp, "kiiiii")
 
+    for element in exp:
 
-        else:
-            if ch in operators:
+        if element in operators:
+            if element == ")":
+                while exp_operator.top() != "(":
+                    # print(exp_operator.stack)
+                    postfix.append(exp_operator.pop())
 
-                if ch == "(" or isHigher(ch, exp_operator.top()) or exp_operator.isEmpty():
-                    exp_operator.push(ch)
+                exp_operator.pop()
 
-                elif ch == ')':
-                    while exp_operator.top() != '(':
-                        op = exp_operator.pop()
-                        postfix += op
-                        postfix += " "
+            elif element == "(":
+                exp_operator.push(element)
 
-                    exp_operator.pop()
+            elif exp_operator.isEmpty():
+                exp_operator.push(element)
 
-
-                else:
-                    while not isHigher(ch, exp_operator.top()):
-                        op = exp_operator.pop()
-                        postfix += op
-                        postfix += " "
+            elif isHigher(element , exp_operator.top()):
+                print(exp_operator.stack)
+                exp_operator.push(element)
 
 
             else:
-                postfix += ch
-                postfix += " "
 
-            ch = ""
+                print(exp_operator.stack , element)
+                postfix.append(exp_operator.pop())
+
+                exp_operator.push(element)
+
+        else:
+            postfix.append(element)
+
+
 
     while not exp_operator.isEmpty():
+
         op = exp_operator.pop()
-        postfix += op
-        postfix += " "
+        postfix.append(op)
 
     return postfix
 
@@ -122,58 +124,50 @@ def postfix_calculator(exp):
 
 def Infix_to_Prefix(exp):
 
-    pre = []
-    ch = ""
+    exp = exp.split(" ")
+    exp = exp[::-1]
 
-    for i in range(len(exp)):
-        if exp[i] == " ":
-            pre.append(ch)
-            pre.append(" ")
-            ch = ""
+    # print(exp)
+
+    prefix = ""
+
+    for element in exp:
+        if element == '(':
+            prefix += ')'
+
+        elif element == ')':
+            prefix += '('
 
         else:
-            ch += exp[i]
+            prefix += element
 
-    pre.append(exp[-1])
-
-
-    print(pre)
-
-    pre = pre[::-1]
-
-    exp_pre = ""
-
-    for i in range(len(pre)):
-
-        if pre[i] == "(":
-            pre[i] = ')'
-        elif pre[i] == ')':
-            pre[i] = '('
-
-        exp_pre += pre[i]
-
-    print(exp_pre)
+        prefix += " "
 
 
-    prefix = Infix_to_Postfix(exp_pre)
-    print(prefix)
-    prefix = prefix[::-1]
+    # print(prefix)
 
-    return prefix
+
+    prefix = Infix_to_Postfix(prefix)
+
+    return ' '.join(prefix)
+
+
 
 
 
 
 
 # Test the functions
-exp = "-12 * ( 3 - 1 + 5 ^ 2 )"
+exp = "2 * ( 3 - 1 + 5 ^ 2 )"
 post = Infix_to_Postfix(exp)
 print("Postfix:", post)
 
-res = postfix_calculator(post)
-print("Result:", res)
-
-prefix = Infix_to_Prefix(exp)
-
-print("Prefix: " , prefix)
-
+# res = postfix_calculator(post)
+# print("Result:", res)
+#
+# prefix = Infix_to_Prefix(exp)
+#
+# print("Prefix: " , prefix)
+#
+# res = postfix_calculator(prefix)
+# print("Result:", res)
