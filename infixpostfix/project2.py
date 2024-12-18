@@ -24,7 +24,7 @@ class Stack:
 
 
 def isHigher(op, top_op):
-    if top_op is None:
+    if top_op is None or op is None:
         return True
     precedence = { '(' : 0 , ')' : 0 , '^' : 4 , '*' : 3 , '/' : 3 , '+' : 2 , '-' : 2}
     # print(precedence[top_op] , precedence[op] , top_op , op)
@@ -151,15 +151,63 @@ def Infix_to_Prefix(exp):
 
     # print(prefix)
 
-    postfix = Infix_to_Postfix(" ".join(exp))
+    # postfix = Infix_to_Postfix(" ".join(exp))
+    #
+    # prefix = Infix_to_Postfix(exp).split(" ")[::-1]
 
-    prefix = Infix_to_Postfix(exp).split(" ")[::-1]
+    exp = exp.split(" ")[::-1]
+    prefix = []
+    exp_operator = Stack()
+    operators = {'+', '-', '*', "/", '^', '(', ')'}
+    precedence = {'(': 0, ')': 0, '^': 4, '*': 3, '/': 3, '+': 2, '-': 2}
 
+    for element in exp:
+
+        if element in operators:
+
+            if element == "(":
+                while exp_operator.top() != ")":
+                    # print(exp_operator.stack)
+                    prefix.append(exp_operator.pop())
+
+                exp_operator.pop()
+
+            elif element == ")":
+                exp_operator.push(element)
+
+            elif exp_operator.isEmpty():
+                exp_operator.push(element)
+
+            elif precedence[element] >= precedence[exp_operator.top()]:
+                # print(exp_operator.stack)
+                exp_operator.push(element)
+
+
+            else:
+                while precedence[element] < precedence[exp_operator.top()]:
+                    # print(exp_operator.stack , element)
+                    prefix.append(exp_operator.pop())
+
+                exp_operator.push(element)
+
+
+        else:
+            prefix.append(element)
+
+
+
+    while not exp_operator.isEmpty():
+
+        op = exp_operator.pop()
+        prefix.append(op)
+
+    prefix = reversed(prefix)
     return " ".join(prefix)
 
 
 
 def prefix_calculator(exp):
+
     operands = Stack()
     operators = {'+', '-', '*', '/', '^'}
 
@@ -167,51 +215,53 @@ def prefix_calculator(exp):
     tokens = exp.split()[::-1]
 
     for token in tokens:
-        if token not in operators:  # If the token is an operand
+        if token not in operators:  # Operand
             operands.push(float(token))
-        else:  # The token is an operator
+        else:
             op1 = operands.pop()
             op2 = operands.pop()
-            result = calculator(op2, op1, token)
+            if op1 is None or op2 is None:
+                raise ValueError("Insufficient operands for operator.")
+            result = calculator(op1, op2, token)
             operands.push(result)
 
-    return operands.pop()
+    return operands.top()
 
 
 #######################################################################################################################
-def create_function(exp):
-    # create a function from a string expression
-    # def f(x):
-    #     return eval(input_str)
-    # return f
-    return lambda x: eval(exp)
-
-
-def process_expression(exp):
-    # plot the expression given as a string
-    x = np.linspace(-10, 10, 500)
-
-    # Define the function
-    func = create_function(exp)
-    y = func(x)
-
-    # Create the plot
-    plt.figure(figsize=(10, 5))
-    plt.plot(x, y, label="y = 2x²")
-    plt.title("Plot of y = 2x²")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.axhline(0, color='black', linewidth=0.8)
-    plt.axvline(0, color='black', linewidth=0.8)
-    plt.grid(color='gray', linestyle='--', linewidth=0.5)
-    plt.legend()
-    plt.show()
+# def create_function(exp):
+#     # create a function from a string expression
+#     # def f(x):
+#     #     return eval(input_str)
+#     # return f
+#     return lambda x: eval(exp)
+#
+#
+# def process_expression(exp):
+#     # plot the expression given as a string
+#     x = np.linspace(-10, 10, 500)
+#
+#     # Define the function
+#     func = create_function(exp)
+#     y = func(x)
+#
+#     # Create the plot
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(x, y, label="y = 2x²")
+#     plt.title("Plot of y = 2x²")
+#     plt.xlabel("x")
+#     plt.ylabel("y")
+#     plt.axhline(0, color='black', linewidth=0.8)
+#     plt.axvline(0, color='black', linewidth=0.8)
+#     plt.grid(color='gray', linestyle='--', linewidth=0.5)
+#     plt.legend()
+#     plt.show()
 
 ####################################################################################################################
 
 
 # Test the functions
-exp = "2 * ( -3 - 1 + 5 ^ 2 )"
+exp = "2 * ( 3 - 1 + 5 ^ 2 )"
 post = Infix_to_Postfix(exp)
 print("Postfix:", post)
 
@@ -225,4 +275,4 @@ print("Prefix: " , prefix)
 res = prefix_calculator(prefix)
 print("Result:", res)
 
-process_expression("x ** x * x - x")
+# process_expression("x ** x * x - x")
